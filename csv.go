@@ -7,8 +7,7 @@ import (
 	"os"
 )
 
-// GetCSVData returns all the csv records
-// TODO: Handle file and os.Stdin in separated functions
+// GetCSVData is the public function that returns all the csv records
 func GetCSVData(filename string) ([][]string, error) {
 	if !inputIsStdin(filename) {
 		f, err := os.Open(filename)
@@ -25,46 +24,16 @@ func GetCSVData(filename string) ([][]string, error) {
 			}
 		}()
 
-		// Check if file has data
-		if !fileHasData(f) {
-			err := fmt.Errorf("csv.fileHasData: File %v doesn't contain any data", f.Name())
-			return nil, err
-		}
-
-		// Initialize reader and get the csv records
-		csvReader, err := InitializeReader(f)
+		csvRecords, err := getCSVData(f)
 		if err != nil {
-			err := fmt.Errorf("csvReader.ReadAll: error reading %v: %v", f.Name(), err)
-			return nil, err
-		}
-
-		// ReadAll at once
-		csvRecords, err := csvReader.ReadAll()
-		if err != nil {
-			err := fmt.Errorf("csvReader.ReadAll: error reading %v: %v", f.Name(), err)
 			return nil, err
 		}
 
 		return csvRecords, nil
 
 	} else {
-		// Check if file has data
-		if !fileHasData(os.Stdin) {
-			err := fmt.Errorf("csv.fileHasData: os.Stdin doesn't contain any data")
-			return nil, err
-		}
-
-		// Initialize reader and get the csv records
-		csvReader, err := InitializeReader(os.Stdin)
+		csvRecords, err := getCSVData(os.Stdin)
 		if err != nil {
-			err := fmt.Errorf("csvReader.ReadAll: error reading os.Stdin: %v", err)
-			return nil, err
-		}
-
-		// ReadAll at once
-		csvRecords, err := csvReader.ReadAll()
-		if err != nil {
-			err := fmt.Errorf("csvReader.ReadAll: error reading os.Stdin: %v", err)
 			return nil, err
 		}
 
@@ -86,7 +55,32 @@ func InitializeReader(f *os.File) (*csv.Reader, error) {
 	return r, nil
 }
 
-// fileHasData checks the input file size is greater than 0B
+// getCSVData is the private function that returns the data
+func getCSVData(f *os.File) ([][]string, error) {
+	// Check if file has data
+	if !fileHasData(f) {
+		err := fmt.Errorf("getCSVData.fileHasData: File %v doesn't contain any data", f.Name())
+		return nil, err
+	}
+
+	// Initialize reader and get the csv records
+	csvReader, err := InitializeReader(f)
+	if err != nil {
+		err := fmt.Errorf("getCSVData.csvReader.ReadAll: error reading %v: %v", f.Name(), err)
+		return nil, err
+	}
+
+	// ReadAll at once
+	csvRecords, err := csvReader.ReadAll()
+	if err != nil {
+		err := fmt.Errorf("getCSVData.csvReader.ReadAll: error reading %v: %v", f.Name(), err)
+		return nil, err
+	}
+
+	return csvRecords, nil
+}
+
+// fileHasData checks if the input file contains data
 func fileHasData(file *os.File) bool {
 	f, err := file.Stat()
 	fmt.Printf("fileHasData: %v\n", file.Name())
@@ -101,6 +95,7 @@ func fileHasData(file *os.File) bool {
 	return false
 }
 
+// inputIsStdin checks if the input is os.Stdin or a file
 func inputIsStdin(filename string) bool {
 	return filename == "os.Stdin"
 }
