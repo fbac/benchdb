@@ -3,6 +3,8 @@
 ## Status
 
 [![go test](https://github.com/fbac/benchdb/actions/workflows/gotest.yml/badge.svg)](https://github.com/fbac/benchdb/actions/workflows/gotest.yml)
+[![go build](https://github.com/fbac/benchdb/actions/workflows/gobuild.yml/badge.svg)](https://github.com/fbac/benchdb/actions/workflows/gobuild.yml)
+
 ## Build
 
 - Create bin/benchdb
