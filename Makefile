@@ -4,6 +4,10 @@ TEST_FOLDER = test
 
 .PHONY: build clean test docs
 
+#######################
+# benchdb cmd targets #
+#######################
+
 build:
 	go build -o ${BIN_FOLDER}
 
@@ -12,7 +16,14 @@ clean:
 
 test:
 	go test -v
-	go test -coverprofile coverage.out
+
+coverage:
+	go test -cover -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out
 	
-docs:
+doc:
 	godoc -http localhost:8888
+
+#######################
+# timescaledb targets #
+#######################

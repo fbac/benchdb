@@ -1,8 +1,4 @@
 mode: set
-github.com/fbac/benchdb/main.go:9.13,17.16 4 0
-github.com/fbac/benchdb/main.go:22.2,22.28 1 0
-github.com/fbac/benchdb/main.go:17.16,19.3 1 0
-github.com/fbac/benchdb/main.go:22.28,24.3 1 0
 github.com/fbac/benchdb/csv.go:12.54,13.29 1 1
 github.com/fbac/benchdb/csv.go:13.29,15.17 2 1
 github.com/fbac/benchdb/csv.go:21.3,21.16 1 1
@@ -32,3 +28,7 @@ github.com/fbac/benchdb/csv.go:101.2,101.14 1 1
 github.com/fbac/benchdb/csv.go:93.16,95.3 1 0
 github.com/fbac/benchdb/csv.go:97.18,99.3 1 1
 github.com/fbac/benchdb/csv.go:104.41,106.2 1 1
+github.com/fbac/benchdb/main.go:9.13,17.16 4 0
+github.com/fbac/benchdb/main.go:22.2,22.28 1 0
+github.com/fbac/benchdb/main.go:17.16,19.3 1 0
+github.com/fbac/benchdb/main.go:22.28,24.3 1 0
