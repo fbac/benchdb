@@ -43,8 +43,12 @@ const (
 
 // BenchApp represents one instance of benchdb
 type BenchApp struct {
+	DB *sql.DB
+	benchAppData
+}
+
+type benchAppData struct {
 	mu         sync.Mutex
-	DB         *sql.DB
 	NumQueries int
 	TotalTime  int
 }
@@ -70,20 +74,20 @@ func (b *BenchApp) Initialize() {
 }
 
 func (b *BenchApp) incNumQueries() {
-	b.mu.Lock()
+	b.benchAppData.mu.Lock()
 	b.NumQueries++
-	b.mu.Unlock()
+	b.benchAppData.mu.Unlock()
 }
 
 func (b *BenchApp) incTotalTime(t time.Duration) {
-	b.mu.Lock()
+	b.benchAppData.mu.Lock()
 	b.TotalTime += int(t)
-	b.mu.Unlock()
+	b.benchAppData.mu.Unlock()
 }
 
 func (b *BenchApp) reportData() {
 	log.Printf("Total queries processed: %v\n", b.NumQueries)
-	log.Printf("Total processing time: %v ms\n", float64(b.TotalTime)/float64(time.Millisecond))
+	log.Printf("Total processing time: %v ms\n", float64(b.benchAppData.TotalTime)/float64(time.Millisecond))
 }
 
 // queryDB is the method to create a bench query
