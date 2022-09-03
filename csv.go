@@ -83,7 +83,7 @@ func getCSVData(f *os.File) ([][]string, error) {
 // fileHasData checks if the input file contains data
 func fileHasData(file *os.File) bool {
 	f, err := file.Stat()
-	fmt.Printf("fileHasData: %v\n", file.Name())
+
 	if err != nil {
 		return false
 	}

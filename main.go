@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 )
 
@@ -12,6 +11,10 @@ func main() {
 	//maxThreads := flag.Int("max-threads", 1, "max threads to process csv")
 	flag.Parse()
 
+	// Initialize benchdb
+	benchdb := BenchApp{}
+	benchdb.Initialize()
+
 	// Retrieve all the csv records
 	records, err := GetCSVData(*csvFile)
 	if err != nil {
@@ -19,7 +22,15 @@ func main() {
 	}
 
 	// Temporal debug
-	for _, v := range records {
-		fmt.Println(v)
+	for k := range records {
+		query := Query{records[k][0], records[k][1], records[k][2]}
+		tTime, err := query.queryDB(&benchdb)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Printf("query %v took %v\n", k, tTime)
 	}
+
+	benchdb.reportData()
 }
