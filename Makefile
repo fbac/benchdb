@@ -54,4 +54,4 @@ dbclean:
 
 dbwait:
 	@echo -e "# waiting for pgsql to boot\n"
-	@sleep 30
+	@sleep 15

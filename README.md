@@ -7,11 +7,20 @@
 
 ## Build
 
-> Requirements
->
-> psql client
->
-> docker
+### Requirements
+
+The following binaries are required to run the complete workflow
+
+- psql
+- docker
+
+### Steps
+
+- Create, configure and populate database
+
+```bash
+make db
+```
 
 - Create bin/benchdb
 
@@ -19,15 +28,47 @@
 make build
 ```
 
+- Run bin/benchdb
+  Usage as follows
+
+```bash
+$ bin/benchdb -help                                                                                             
+Usage of bin/benchdb:
+  -csv-file string
+        path to query csv file
+
+Examples:
+bin/benchdb < test/query.csv
+bin/benchdb -csv-file test/query.csv
+```
+
+### Additional Makefile targets
+
 - Clean binary
 
 ```bash
 make clean
 ```
 
-## Usage
+- Run test suite
 
-## Statistics
+```bash
+make test
+```
+
+- Run coverage report
+
+```bash
+make coverage
+```
+
+- View docs in browser
+
+```bash
+make docs
+```
+
+## Statistics gathered
 
 - For each worker
   
