@@ -46,7 +46,7 @@ type BenchApp struct {
 	mu         sync.Mutex
 	DB         *sql.DB
 	NumQueries int
-	TotalTime  time.Time
+	TotalTime  int
 }
 
 // Query represents one instance of sql query
@@ -77,13 +77,13 @@ func (b *BenchApp) incNumQueries() {
 
 func (b *BenchApp) incTotalTime(t time.Duration) {
 	b.mu.Lock()
-	b.TotalTime.Add(t)
+	b.TotalTime += int(t)
 	b.mu.Unlock()
 }
 
 func (b *BenchApp) reportData() {
 	log.Printf("Total queries processed: %v\n", b.NumQueries)
-	log.Printf("Total processing time: %v\n", b.TotalTime)
+	log.Printf("Total processing time: %v ms\n", float64(b.TotalTime)/float64(time.Millisecond))
 }
 
 // queryDB is the method to create a bench query
