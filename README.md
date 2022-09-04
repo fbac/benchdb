@@ -81,5 +81,8 @@ make docs
 
 ## Technical debt
 
+- Divide packages instead of using package main
 - Create doc.go per package
+- Use real production-ready folder tree
 - Coverage 100%
+- Use logrus to log by level

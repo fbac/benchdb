@@ -10,7 +10,7 @@ PG_IS_READY_BIN = $(pg_isready)
 # benchdb cmd targets #
 #######################
 
-build:
+build: clean
 	go build -o ${BIN_FOLDER}
 
 clean:

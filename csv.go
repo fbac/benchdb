@@ -71,6 +71,8 @@ func getCSVData(f *os.File) ([][]string, error) {
 	}
 
 	// ReadAll at once
+	// It's more expensive in memory, but nicer on cpu
+	// Memory is less expensive than cpu nowadays
 	csvRecords, err := csvReader.ReadAll()
 	if err != nil {
 		err := fmt.Errorf("getCSVData.csvReader.ReadAll: error reading %v: %v", f.Name(), err)

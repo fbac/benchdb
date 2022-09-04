@@ -25,7 +25,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"sync"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -41,17 +40,15 @@ const (
 	dbname   = "homework"
 )
 
-// BenchApp represents one instance of benchdb
-type BenchApp struct {
-	DB *sql.DB
-	benchAppData
-}
-
-type benchAppData struct {
-	mu         sync.Mutex
-	NumQueries int
-	TotalTime  int
-}
+const benchQueryTempl = `
+	SELECT time_bucket('1 minutes', ts) AS one_min, 
+	min(usage), 
+	max(usage) 
+	FROM cpu_usage 
+	WHERE host = $1 AND ts >= $2 AND ts < $3 
+	GROUP BY one_min 
+	ORDER BY one_min ASC;
+	`
 
 // Query represents one instance of sql query
 type Query struct {
@@ -60,39 +57,33 @@ type Query struct {
 	EndTime   string
 }
 
-// Initialize is the public method to initialize the app
-func (b *BenchApp) Initialize() {
-	var err error
-	conn := fmt.Sprintf("user=%s password=%s dbname=%s port=%v sslmode=disable", user, password, dbname, port)
+// benchDB represents one instance of benchDB
+type benchDB struct {
+	DB *sql.DB
+}
 
-	b.DB, err = sql.Open("postgres", conn)
+// NewBenchDB returns a new instance of benchDB
+func NewBenchDB() *benchDB {
+	conn := handleDBConnection()
+	db, err := sql.Open("postgres", conn)
 	if err != nil {
 		log.Fatalf("db not connected: %v", err)
 	}
 
 	log.Println("db connected!")
+
+	return &benchDB{db}
 }
 
-func (b *BenchApp) incNumQueries() {
-	b.benchAppData.mu.Lock()
-	b.NumQueries++
-	b.benchAppData.mu.Unlock()
+// handleDBConnection returns a connection to a DB
+// Insecure: refactor for production usage
+func handleDBConnection() string {
+	return fmt.Sprintf("user=%s password=%s dbname=%s port=%v sslmode=disable", user, password, dbname, port)
 }
 
-func (b *BenchApp) incTotalTime(t time.Duration) {
-	b.benchAppData.mu.Lock()
-	b.TotalTime += int(t)
-	b.benchAppData.mu.Unlock()
-}
-
-func (b *BenchApp) reportData() {
-	log.Printf("Total queries processed: %v\n", b.NumQueries)
-	log.Printf("Total processing time: %v ms\n", float64(b.benchAppData.TotalTime)/float64(time.Millisecond))
-}
-
-// queryDB is the method to create a bench query
+// queryDB creates a bench query
 // It returns time.Duration as benchmarking data to be processed
-func (p *Query) queryDB(b *BenchApp) (time.Duration, error) {
+func (p *Query) queryDB(b benchApp) (time.Duration, error) {
 	// Increase number of queries processed
 	b.incNumQueries()
 
@@ -100,9 +91,10 @@ func (p *Query) queryDB(b *BenchApp) (time.Duration, error) {
 	t0 := time.Now()
 
 	// Query DB
-	_, err := b.DB.Query(`SELECT time_bucket('1 minutes', ts) AS one_min, min(usage), max(usage) FROM cpu_usage WHERE host = $1 AND ts >= $2 AND ts < $3 GROUP BY one_min ORDER BY one_min ASC;`, p.Hostname, p.StartTime, p.EndTime)
+	// return 0 if there's an error, so no metrics are altered
+	_, err := b.db.DB.Query(benchQueryTempl, p.Hostname, p.StartTime, p.EndTime)
 	if err != nil {
-		return time.Duration(-1), err // return -1 if hit error
+		return time.Duration(0), err
 	}
 
 	// Stop benchmarking
