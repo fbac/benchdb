@@ -9,36 +9,25 @@ import (
 
 // GetCSVData is the public function that returns all the csv records
 func GetCSVData(filename string) ([][]string, error) {
-	if !inputIsStdin(filename) {
-		f, err := os.Open(filename)
-		if err != nil {
-			err := fmt.Errorf("GetCSVData.Open(%s)", f.Name())
-			return nil, err
-		}
-
-		// Handle the file closure in a func, so the err can be handled
-		defer func() {
-			err := f.Close()
-			if err != nil {
-				log.Fatalf("csv: error closing %s: %v", f.Name(), err)
-			}
-		}()
-
-		csvRecords, err := getCSVData(f)
-		if err != nil {
-			return nil, err
-		}
-
-		return csvRecords, nil
-
-	} else {
-		csvRecords, err := getCSVData(os.Stdin)
-		if err != nil {
-			return nil, err
-		}
-
-		return csvRecords, nil
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
 	}
+
+	// Handle the file closure in a func, so the err can be handled
+	defer func() {
+		err := f.Close()
+		if err != nil {
+			log.Fatalf("csv: error closing %s: %v", f.Name(), err)
+		}
+	}()
+
+	csvRecords, err := getCSVData(f)
+	if err != nil {
+		return nil, err
+	}
+
+	return csvRecords, nil
 }
 
 // InitializeReader discards the first csv line (headers)
@@ -95,9 +84,4 @@ func fileHasData(file *os.File) bool {
 	}
 
 	return false
-}
-
-// inputIsStdin checks if the input is os.Stdin or a file
-func inputIsStdin(filename string) bool {
-	return filename == "os.Stdin"
 }

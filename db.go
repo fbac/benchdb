@@ -90,7 +90,7 @@ func (p *Query) queryDB(b benchApp) (time.Duration, error) {
 	// Start benchmarking
 	t0 := time.Now()
 
-	// Query DB
+	// Query DB and discard data to avoid using memory
 	// return 0 if there's an error, so no metrics are altered
 	_, err := b.db.DB.Query(benchQueryTempl, p.Hostname, p.StartTime, p.EndTime)
 	if err != nil {

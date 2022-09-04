@@ -130,37 +130,3 @@ func Test_fileHasData(t *testing.T) {
 		})
 	}
 }
-
-func Test_inputIsStdin(t *testing.T) {
-	type args struct {
-		filename string
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		{
-			"Check os.Stdin",
-			args{filename: "os.Stdin"},
-			true,
-		},
-		{
-			"Check test/data.csv",
-			args{filename: "test/data.csv"},
-			false,
-		},
-		{
-			"Check empty file",
-			args{filename: ""},
-			false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := inputIsStdin(tt.args.filename); got != tt.want {
-				t.Errorf("inputIsStdin() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
