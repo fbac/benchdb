@@ -32,13 +32,13 @@ make build
   Usage as follows
 
 ```bash
-$ bin/benchdb -help                                                                                             
-Usage of bin/benchdb:
+$ bin/benchdb -help
   -csv-file string
-        path to query csv file
+        path to query csv file (default "data-file.csv")
+  -max-threads int
+        max threads to process csv (default 1)
 
-Examples:
-bin/benchdb < test/query.csv
+Example:
 bin/benchdb -csv-file test/query.csv
 ```
 
@@ -81,8 +81,8 @@ make docs
 
 ## Technical debt
 
-- Divide packages instead of using package main
+- Divide packages instead of using only package main
+- Use real production-ready folder tree, inside internal/ and divided by pkg/ and cmd/
 - Create doc.go per package
-- Use real production-ready folder tree
-- Coverage 100%
+- Test coverage 100%
 - Use logrus to log by level

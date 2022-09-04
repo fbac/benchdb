@@ -8,6 +8,7 @@ import (
 )
 
 // GetCSVData is the public function that returns all the csv records
+// Return all records at once: more expensive in mem, nicer on cpu
 func GetCSVData(filename string) ([][]string, error) {
 	f, err := os.Open(filename)
 	if err != nil {
@@ -22,17 +23,12 @@ func GetCSVData(filename string) ([][]string, error) {
 		}
 	}()
 
-	csvRecords, err := getCSVData(f)
-	if err != nil {
-		return nil, err
-	}
-
-	return csvRecords, nil
+	return getCSVData(f)
 }
 
-// InitializeReader discards the first csv line (headers)
+// initializeReader discards the first csv line (headers)
 // And returns a csv.Reader pointing to the next offset
-func InitializeReader(f *os.File) (*csv.Reader, error) {
+func initializeReader(f *os.File) (*csv.Reader, error) {
 	r := csv.NewReader(f)
 
 	_, err := r.Read()
@@ -53,7 +49,7 @@ func getCSVData(f *os.File) ([][]string, error) {
 	}
 
 	// Initialize reader and get the csv records
-	csvReader, err := InitializeReader(f)
+	csvReader, err := initializeReader(f)
 	if err != nil {
 		err := fmt.Errorf("getCSVData.csvReader.ReadAll: error reading %v: %v", f.Name(), err)
 		return nil, err

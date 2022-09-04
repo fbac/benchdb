@@ -83,7 +83,7 @@ func TestInitializeReader(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := InitializeReader(tt.args.f)
+			got, err := initializeReader(tt.args.f)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("InitializeReader() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -30,7 +30,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Hardcoded constant
+// Hardcoded datasource
 // Insecure: refactor for production usage
 const (
 	host     = "localhost"
@@ -69,7 +69,6 @@ func NewBenchDB() *benchDB {
 	if err != nil {
 		log.Fatalf("db not connected: %v", err)
 	}
-
 	log.Println("db connected!")
 
 	return &benchDB{db}
@@ -83,26 +82,26 @@ func handleDBConnection() string {
 
 // queryDB creates a bench query
 // It returns time.Duration as benchmarking data to be processed
-func (p *Query) queryDB(b benchApp) (time.Duration, error) {
+func (p *Query) queryDB(b benchApp) error {
 	// Increase number of queries processed
 	b.incNumQueries()
 
 	// Start benchmarking
 	t0 := time.Now()
 
-	// Query DB and discard data to avoid using memory
-	// return 0 if there's an error, so no metrics are altered
+	// Query the database and discard data to avoid using memory
 	_, err := b.db.DB.Query(benchQueryTempl, p.Hostname, p.StartTime, p.EndTime)
 	if err != nil {
-		return time.Duration(0), err
+		return err
 	}
 
 	// Stop benchmarking
 	t1 := time.Now()
 	tTotal := t1.Sub(t0)
 
-	// Increase total duration
-	b.incTotalTime(tTotal)
+	// Update statistics
+	b.ProcessData(tTotal)
+	log.Printf("Querying %s from %v to %v took %v ms", p.Hostname, p.StartTime, p.EndTime, float64(tTotal)/float64(time.Millisecond))
 
-	return tTotal, nil
+	return nil
 }

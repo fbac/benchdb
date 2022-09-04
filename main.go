@@ -7,7 +7,7 @@ import (
 
 func main() {
 	// Initialize cmd flags
-	csvFile := flag.String("csv-file", "foo/bar/data-file.csv", "path to query csv file")
+	csvFile := flag.String("csv-file", "data-file.csv", "path to query csv file")
 	maxThreads := flag.Int("max-threads", 1, "max threads to process csv")
 	flag.Parse()
 
@@ -23,13 +23,11 @@ func main() {
 	// DEBUG: Temporal boilerplate code
 	for k := range records {
 		query := Query{records[k][0], records[k][1], records[k][2]}
-		tTime, err := query.queryDB(*benchdb)
-		if err != nil {
+		if err := query.queryDB(*benchdb); err != nil {
 			log.Fatal(err)
 		}
-
-		log.Printf("query %v took %v\n", k, tTime)
 	}
 
-	benchdb.reportData()
+	// Report benchmarking data
+	benchdb.ReportData()
 }
