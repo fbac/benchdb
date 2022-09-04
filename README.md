@@ -9,12 +9,18 @@
 
 ### Requirements
 
-The following binaries are required to run the complete workflow
+The following binaries must be installed in your system
 
 - psql
 - docker
 
 ### Steps
+
+NOTE: During the db config process, the password will be asked via prompt.
+
+It is "postgres" and has to be introduced manually.
+
+#### Manual procedure
 
 - Create, configure and populate database
 
@@ -40,6 +46,15 @@ $ bin/benchdb -help
 
 Example:
 bin/benchdb -csv-file test/query.csv
+```
+
+#### Automatic procedure
+
+- Alternatively a test-run is available
+  This will set the db up and running, and run a query test suite
+
+```bash
+make test-run
 ```
 
 ### Additional Makefile targets
@@ -70,14 +85,12 @@ make docs
 
 ## Statistics gathered
 
-- For each worker
-  
-    1. number of queries run
-    2. total processing time of all queries (measure every query processing time)
-    3. max query time
-    4. min query time
-    5. avg query time
-    6. median query time
+- number of queries run
+- total processing time of all queries (measure every query processing time)
+- max query time
+- min query time
+- avg query time
+- median query time
 
 ## Technical debt
 
@@ -86,3 +99,5 @@ make docs
 - Create doc.go per package
 - Test coverage 100%
 - Use logrus to log by level
+- Modify timescaledb entrypoint to accept scripts from stdin
+- Introduce password automatically during workflow

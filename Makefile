@@ -10,7 +10,7 @@ PG_IS_READY_BIN = $(pg_isready)
 # benchdb cmd targets #
 #######################
 
-build: clean
+build: clean test
 	go build -o ${BIN_FOLDER}
 
 clean:
@@ -18,6 +18,9 @@ clean:
 
 test:
 	go test -v
+
+test-run: db
+	bin/benchdb -csv-file test/query.csv
 
 coverage:
 	go test -cover -coverprofile=coverage.out ./...
@@ -39,8 +42,8 @@ dbrun:
 
 dbcfg:
 	@echo -e "# configure pgsql\n"
-	@psql -v -w -U postgres -h127.0.0.1 -p5432 < assets/cpu_usage.sql
-	@psql -v -w -U postgres -h127.0.0.1 -p5432 -d homework -c "\COPY cpu_usage FROM assets/cpu_usage.csv CSV HEADER"
+	@POSTGRES_PASSWORD=postgres psql -v -w -U postgres -h127.0.0.1 -p5432 < assets/cpu_usage.sql
+	@POSTGRES_PASSWORD=postgres psql -v -w -U postgres -h127.0.0.1 -p5432 -d homework -c "\COPY cpu_usage FROM assets/cpu_usage.csv CSV HEADER"
 
 dbcheck:
 	@echo -e "# checking pgsql readiness\n"

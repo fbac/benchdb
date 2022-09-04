@@ -1,65 +1,42 @@
 package main
 
-import (
-	"fmt"
-	"log"
-	"sync"
-)
-
-type queryData struct {
-	data interface{}
-}
-
-type queryFunc func() queryData
+/*
+type queryFunc func() error
 
 type QueryJob struct {
-	query    queryFunc
-	dataChan chan queryData
+	query queryFunc
 }
 
 type worker struct {
-	id       int
-	workChan chan QueryJob
-	exitChan chan bool
+	queries chan QueryJob
 }
 
-type workerPool struct {
-	mu             sync.RWMutex
-	maxThreads     int
-	maxConcurrency int
-	workers        []*worker
+func NewWorker() *worker {
+	worker := &worker{
+		queries: make(chan QueryJob),
+	}
+
+	//go worker.startWorker()
+
+	return worker
 }
 
-func (w *worker) scheduleWork(jobs <-chan QueryJob, results chan<- queryData) {
-	for job := range jobs {
-		fmt.Println("worker", w.id, "started job", job)
-	}
+//func (w *worker) startWorker() {
+//	for q := range w.queries {
+//q.query
+//	}
+//}
+
+func (w *worker) Do(query QueryJob) {
+	w.queries <- query
 }
 
-func NewWorker(id int) *worker {
-	w := &worker{
-		id:       id,
-		workChan: make(chan QueryJob),
-		exitChan: make(chan bool),
-	}
-	log.Println("created worker", id)
-	return w
-}
-
-func NewWorkerPool(maxThreads int) *workerPool {
-	wp := &workerPool{
-		maxThreads: maxThreads,
-	}
-
-	for i := 0; i < maxThreads; i++ {
-		wp.workers = append(wp.workers, NewWorker(i))
-	}
-
-	return wp
+// Close is stopping worker.
+func (w *worker) Close() {
+	close(w.queries)
 }
 
 // Bugged code
-/*
 		jobs := make(chan Query, benchdb.wp.maxThreads)
 		results := make(chan time.Duration, benchdb.wp.maxThreads)
 

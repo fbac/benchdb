@@ -9,8 +9,8 @@ import (
 
 // BenchApp represents one instance of benchdb
 type benchApp struct {
-	db   *benchDB
-	wp   *workerPool
+	db *benchDB
+	//wp   *workerPool
 	data *benchAppData
 }
 
@@ -36,8 +36,8 @@ type benchAppData struct {
 // Initialize is the public method to initialize the app
 func NewBenchApp(maxThreads int) *benchApp {
 	return &benchApp{
-		db:   NewBenchDB(),
-		wp:   NewWorkerPool(maxThreads),
+		db: NewBenchDB(),
+		//wp:   NewWorkerPool(maxThreads),
 		data: newBenchAppData(),
 	}
 }
