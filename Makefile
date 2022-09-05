@@ -20,7 +20,7 @@ test:
 	go test -v
 
 test-run: db
-	bin/benchdb -csv-file test/query.csv
+	bin/benchdb -csv-file test/query-50.csv -max-threads 10
 
 coverage:
 	go test -cover -coverprofile=coverage.out ./...

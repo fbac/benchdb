@@ -29,7 +29,7 @@ func createWork(records [][]string, b *benchApp, jobs chan<- *Job) {
 func doWork(id int, jobs <-chan *Job) {
 	defer wg.Done()
 	for job := range jobs {
-		log.Printf("Running %v %s\n", id, job.Hostname)
+		log.Printf("Worker %v running query to %s\n", id, job.Hostname)
 		job.Func()
 	}
 }
