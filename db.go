@@ -90,10 +90,11 @@ func (p *Query) queryDB(b benchApp) error {
 	t0 := time.Now()
 
 	// Query the database and discard data to avoid using memory
-	_, err := b.db.DB.Query(benchQueryTempl, p.Hostname, p.StartTime, p.EndTime)
+	data, err := b.db.DB.Query(benchQueryTempl, p.Hostname, p.StartTime, p.EndTime)
 	if err != nil {
 		return err
 	}
+	defer data.Close()
 
 	// Stop benchmarking
 	t1 := time.Now()

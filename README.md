@@ -101,3 +101,4 @@ make docs
 - Use logrus to log by level
 - Modify timescaledb entrypoint to accept scripts from stdin
 - Introduce password automatically during workflow
+- Introduce proper doWork throttling
