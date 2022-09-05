@@ -101,7 +101,9 @@ func (p *Query) queryDB(b benchApp) error {
 
 	// Update statistics
 	b.ProcessData(tTotal)
-	log.Printf("Querying %s from %v to %v took %v ms", p.Hostname, p.StartTime, p.EndTime, float64(tTotal)/float64(time.Millisecond))
+
+	// DEBUG
+	// log.Printf("Querying %s from %v to %v took %v ms", p.Hostname, p.StartTime, p.EndTime, float64(tTotal)/float64(time.Millisecond))
 
 	return nil
 }

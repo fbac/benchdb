@@ -20,13 +20,19 @@ func main() {
 		log.Fatalf("main: error retrieving data from %s: %v", *csvFile, err)
 	}
 
-	// DEBUG: Temporal boilerplate code
-	for k := range records {
-		query := Query{records[k][0], records[k][1], records[k][2]}
-		if err := query.queryDB(*benchdb); err != nil {
-			log.Fatal(err)
-		}
+	// Create Job channel
+	jobs := make(chan *Job, len(records))
+
+	// Start workers
+	for i := 0; i < *maxThreads; i++ {
+		wg.Add(1)
+		go doWork(i, jobs)
 	}
+	// Create work
+	go createWork(records, benchdb, jobs)
+
+	// Wait until all work is done
+	wg.Wait()
 
 	// Report benchmarking data
 	benchdb.ReportData()
