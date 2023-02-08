@@ -3,7 +3,6 @@ name: test-unit
 on:
   push:
     branches:
-      - master
       - main
   pull_request:
 
