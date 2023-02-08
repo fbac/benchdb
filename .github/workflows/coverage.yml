@@ -15,23 +15,18 @@ concurrency:
 env:
   GO111MODULE: "on"
   RUN_BASE_COVERAGE: "on" # Runs test for PR base in case base test coverage is missing.
-  COV_GO_VERSION: 1.18.x # Version of Go to collect coverage
+  COV_GO_VERSION: 1.19 # Version of Go to collect coverage
   TARGET_DELTA_COV: 90 # Target coverage of changed lines, in percents
 jobs:
   test:
-    strategy:
-      matrix:
-        go-version: [1.19.x]
     runs-on: ubuntu-latest
     steps:
       - name: Install Go stable
-        if: matrix.go-version != 'tip'
         uses: actions/setup-go@v3
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version: 1.19
 
       - name: Install Go tip
-        if: matrix.go-version == 'tip'
         run: |
           curl -sL https://storage.googleapis.com/go-build-snap/go/linux-amd64/$(git ls-remote https://github.com/golang/go.git HEAD | awk '{print $1;}').tar.gz -o gotip.tar.gz
           ls -lah gotip.tar.gz
@@ -58,7 +53,6 @@ jobs:
 
       - name: Restore base test coverage
         id: base-coverage
-        if: matrix.go-version == env.COV_GO_VERSION && github.event.pull_request.base.sha != ''
         uses: actions/cache@v2
         with:
           path: |
@@ -67,7 +61,7 @@ jobs:
           key: ${{ runner.os }}-unit-test-coverage-${{ (github.event.pull_request.base.sha != github.event.after) && github.event.pull_request.base.sha || github.event.after }}
 
       - name: Run test for base code
-        if: matrix.go-version == env.COV_GO_VERSION && env.RUN_BASE_COVERAGE == 'on' && steps.base-coverage.outputs.cache-hit != 'true' && github.event.pull_request.base.sha != ''
+        if: steps.base-coverage.outputs.cache-hit != 'true' && github.event.pull_request.base.sha != ''
         run: |
           git fetch origin master ${{ github.event.pull_request.base.sha }}
           HEAD=$(git rev-parse HEAD)
@@ -86,7 +80,7 @@ jobs:
 
       - name: Annotate missing test coverage
         id: annotate
-        if: matrix.go-version == env.COV_GO_VERSION && github.event.pull_request.base.sha != ''
+        if: github.event.pull_request.base.sha != ''
         run: |
           curl -sLO https://github.com/vearutop/gocovdiff/releases/download/v1.3.6/linux_amd64.tar.gz && tar xf linux_amd64.tar.gz
           gocovdiff_hash=$(git hash-object ./gocovdiff)
@@ -103,7 +97,7 @@ jobs:
 
       - name: Comment test coverage
         continue-on-error: true
-        if: matrix.go-version == env.COV_GO_VERSION && github.event.pull_request.base.sha != ''
+        if: github.event.pull_request.base.sha != ''
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -129,7 +123,6 @@ jobs:
         run: cp unit.txt unit-base.txt
 
       - name: Upload code coverage
-        if: matrix.go-version == env.COV_GO_VERSION
         uses: codecov/codecov-action@v1
         with:
           file: ./unit.coverprofile
